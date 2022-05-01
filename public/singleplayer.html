@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat&display=swap" rel="stylesheet">
+    
+    <!-- YASH NOTE: Since this is a singleplayer gamemode, socket is not needed -->
     <!-- <script src="/socket.io/socket.io.js"></script> -->
 
     <script>
@@ -17,23 +19,9 @@
     <script src="app.js" charset="utf-8"></script>
   </head>
   <body>
-    <!-- <button id="singlePlayerButton">SinglePlayer</button>
-    <button id="multiPlayerButton">Multiplayer</button>
-
-    <div class="player p1">
-      Player 1
-      <div class="connected">Connected <span></span></div>
-      <div class="ready">Ready<span></span></div>
-    </div>
-    <div class="player p2">
-      Player 2
-      <div class="connected">Connected <span></span></div>
-      <div class="ready">Ready<span></span></div>
-    </div> -->
-
     <div class="container">
-        <div class="grid grid-user"></div>
-        <div class="grid grid-computer"></div>
+        <div class="battleship-grid grid-user"></div>
+        <div class="battleship-grid grid-computer"></div>
     </div>
 
     <div class="hidden-info">
@@ -50,6 +38,7 @@
       <div class="ship battleship-container" draggable="true"><div id="battleship-0"></div><div id="battleship-1"></div><div id="battleship-2"></div><div id="battleship-3"></div></div>
       <div class="ship carrier-container" draggable="true"><div id="carrier-0"></div><div id="carrier-1"></div><div id="carrier-2"></div><div id="carrier-3"></div><div id="carrier-4"></div></div>
     </div>
+<!-- </div> -->
 
   </body>
 </html>

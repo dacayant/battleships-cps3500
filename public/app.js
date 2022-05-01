@@ -89,7 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
     generate(shipArray[3])
     generate(shipArray[4])
 
-    startButton.addEventListener('click', playGameSingle)
+    startButton.addEventListener('click', () => {
+      if (allShipsPlaced) playGameSingle()
+      else infoDisplay.innerHTML = "Please place all ships"
+    })
   }
 
   // Multiplayer
@@ -359,6 +362,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let battleshipCount = 0
   let carrierCount = 0
 
+  let destroyerBroke = false
+  let submarineBroke = false
+  let cruiserBroke = false
+  let battleshipBroke = false
+  let carrierBroke = false
+
 
   function revealSquare(classList) {
     const enemySquare = computerGrid.querySelector(`div[data-id='${shotFired}']`)
@@ -386,6 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let cpuBattleshipCount = 0
   let cpuCarrierCount = 0
 
+  let cpuDestroyerBroke = false
+  let cpuSubmarineBroke = false
+  let cpuCruiserBroke = false
+  let cpuBattleshipBroke = false
+  let cpuCarrierBroke = false
 
   function enemyGo(square) {
     if (gameMode === 'singlePlayer') square = Math.floor(Math.random() * userSquares.length)
@@ -407,49 +421,53 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gameMode === 'multiPlayer') enemy = 'Enemy'
     if (destroyerCount === 2) {
       infoDisplay.innerHTML = `You sunk the ${enemy}'s destroyer`
-      destroyerCount = 10
+      destroyerBroke = true
     }
     if (submarineCount === 3) {
       infoDisplay.innerHTML = `You sunk the ${enemy}'s submarine`
-      submarineCount = 10
+      submarineBroke = true
     }
     if (cruiserCount === 3) {
       infoDisplay.innerHTML = `You sunk the ${enemy}'s cruiser`
-      cruiserCount = 10
+      cruiserBroke = true
     }
     if (battleshipCount === 4) {
       infoDisplay.innerHTML = `You sunk the ${enemy}'s battleship`
-      battleshipCount = 10
+      battleshipBroke = true
     }
     if (carrierCount === 5) {
       infoDisplay.innerHTML = `You sunk the ${enemy}'s carrier`
-      carrierCount = 10
+      carrierBroke = true
     }
     if (cpuDestroyerCount === 2) {
       infoDisplay.innerHTML = `${enemy} sunk your destroyer`
-      cpuDestroyerCount = 10
+      cpuDestroyerBroke = true
     }
     if (cpuSubmarineCount === 3) {
       infoDisplay.innerHTML = `${enemy} sunk your submarine`
-      cpuSubmarineCount = 10
+      cpuSubmarineBroke = true
     }
     if (cpuCruiserCount === 3) {
       infoDisplay.innerHTML = `${enemy} sunk your cruiser`
-      cpuCruiserCount = 10
+      cpuCruiserBroke = true
     }
     if (cpuBattleshipCount === 4) {
       infoDisplay.innerHTML = `${enemy} sunk your battleship`
-      cpuBattleshipCount = 10
+      cpuBattleshipBroke = true
     }
     if (cpuCarrierCount === 5) {
       infoDisplay.innerHTML = `${enemy} sunk your carrier`
-      cpuCarrierCount = 10
+      cpuCarrierBroke = true
     }
-    if ((destroyerCount + submarineCount + cruiserCount + battleshipCount + carrierCount) === 50) {
+    console.log("P1 Points: " + destroyerBroke + submarineBroke + cruiserBroke + battleshipBroke + carrierBroke)
+    console.log("P1 Points: " + destroyerCount + " "+ submarineCount + " "+ cruiserCount + " "+ battleshipCount + " "+ carrierCount)
+    console.log("CPU Points: " + cpuDestroyerBroke + cpuSubmarineBroke + cpuCruiserBroke + cpuBattleshipBroke + cpuCarrierBroke)
+
+    if (destroyerBroke && submarineBroke && cruiserBroke && battleshipBroke && carrierBroke) {
       infoDisplay.innerHTML = "YOU WIN"
       gameOver()
     }
-    if ((cpuDestroyerCount + cpuSubmarineCount + cpuCruiserCount + cpuBattleshipCount + cpuCarrierCount) === 50) {
+    if ((cpuDestroyerBroke && cpuSubmarineBroke && cpuCruiserBroke && cpuBattleshipBroke && cpuCarrierBroke)) {
       infoDisplay.innerHTML = `${enemy.toUpperCase()} WINS`
       gameOver()
     }
