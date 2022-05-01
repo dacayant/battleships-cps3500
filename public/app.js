@@ -12,142 +12,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const rotateButton = document.querySelector('#rotate')
   const turnDisplay = document.querySelector('#whose-go')
   const infoDisplay = document.querySelector('#info')
-  const singlePlayerButton = document.querySelector("#singlePlayerButton")
-  const multiPlayerButton = document.querySelector("#multiPlayerButton")
+  // const singlePlayerButton = document.querySelector("#singlePlayerButton")
+  // const multiPlayerButton = document.querySelector("#multiPlayerButton")
   const userSquares = []
   const computerSquares = []
   let isHorizontal = true
   let isGameOver = false
   let currentPlayer = 'user'
   const width = 10
-  let gameMode = ""
+  // let gameMode = ""
   let playerNumber = 0
   let ready = false
   let enemyReady = false
   let allShipsPlaced = false
   let shotFired = -1
-
-  // Select Player Mode
-  if(singlePlayerButton) singlePlayerButton.addEventListener('click', startSinglePlayer)
-  if (multiPlayerButton) multiPlayerButton.addEventListener('click', startMultiPlayer)
-
-  // Singleplayer
-  function startSinglePlayer() {
-    gameMode = "singlePlayer"
-
-    generate(shipArray[0])
-    generate(shipArray[1])
-    generate(shipArray[2])
-    generate(shipArray[3])
-    generate(shipArray[4])
-
-    startButton.addEventListener('click', playGameSingle)
-  }
-
-  // Multiplayer
-  function startMultiPlayer() {
-    gameMode = "multiPlayer"
-
-    const socket = io()
-
-    // Get your player number
-    // Searches for a "player-number" message from the server
-    socket.on("player-number", num => {
-      if (num === -1) {
-        infoDisplay.innerHTML = "Sorry the server is full"
-      }
-      else {
-        playerNumber = parseInt(num)
-        if (playerNumber === 1) currentPlayer = "enemy"    // If second, considered "enemy"
-
-        console.log(playerNumber)
-
-        // Get other player status
-        socket.emit('check-players')
-      }
-    })
-
-
-    // Another player has connected/disconnected
-    socket.on('player-connection', num => {
-      console.log(`Player number ${num} has connected or disconnected`)
-      playerConnectedOrDisconnected(num)
-    })
-
-    // On enemy ready
-    socket.on('enemy-ready', num => {
-      enemyReady = true
-      playerReady(num)
-      if (ready) playGameMulti(socket)
-    })
-
-    // check player status
-    socket.on('check-players', players => {
-      players.forEach((p, i) => {
-        if(p.connected) playerConnectedOrDisconnected(i)
-        if(p.ready){
-          playerReady(i)
-          if(i !== playerNumber) enemyReady = true
-        }
-      })
-    })
-
-    // On timeout
-    socket.on('timeout', () => {
-      infoDisplay.innerHTML = 'You have reached the 10 minute limit'
-    })
-
-    // ready button click
-    startButton.addEventListener('click', () => {
-      if(allShipsPlaced) playGameMulti(socket)
-      else infoDisplay.innerHTML = "Please place all ships"
-    })
-
-    // Setup event listener for firing
-    computerSquares.forEach(square => { 
-      square.addEventListener('click', () => {
-        if(currentPlayer === 'user' && ready && enemyReady) {
-          shotFired = square.dataset.id
-          
-          // Turn Player sends a shot to the other player; Server receives the shot and passes it to the other player's client
-          socket.emit('fire', shotFired)
-        }
-      })
-    })
-
-    // On fire Received
-    socket.on('fire', id => {
-      enemyGo(id)
-      const square = userSquares[id]
-      socket.emit('fire-reply', square.classList)
-      playGameMulti(socket)
-    })
-
-    // On fire reply receievd
-    socket.on('fire-reply', classList => {
-      revealSquare(classList)
-      playGameMulti(socket)
-    })
-
-    function playerConnectedOrDisconnected(num) {
-      let player = `.p${parseInt(num) + 1}`
-      document.querySelector(`${player} .connected span`).classList.toggle('green')
-      if(parseInt(num) === playerNumber) document.querySelector(player).style.fontWeight = 'bold'
-    }
-  }
-
-
-  //Create Board
-  function createBoard(grid, squares) {
-    for (let i = 0; i < width * width; i++) {
-      const square = document.createElement('div')
-      square.dataset.id = i
-      grid.appendChild(square)
-      squares.push(square)
-    }
-  }
-  createBoard(userGrid, userSquares)
-  createBoard(computerGrid, computerSquares)
 
   //Ships
   const shipArray = [
@@ -187,6 +65,136 @@ document.addEventListener('DOMContentLoaded', () => {
       ]
     },
   ]
+
+  createBoard(userGrid, userSquares)
+  createBoard(computerGrid, computerSquares)
+
+  // Select Player Mode
+  if (gameMode === 'singlePlayer') {
+    startSinglePlayer()
+  } else {
+    startMultiPlayer()
+  }
+
+  // if(singlePlayerButton) singlePlayerButton.addEventListener('click', startSinglePlayer)
+  // if (multiPlayerButton) multiPlayerButton.addEventListener('click', startMultiPlayer)  
+
+  // Singleplayer
+  function startSinglePlayer() {
+    // gameMode = "singlePlayer"
+
+    generate(shipArray[0])
+    generate(shipArray[1])
+    generate(shipArray[2])
+    generate(shipArray[3])
+    generate(shipArray[4])
+
+    startButton.addEventListener('click', playGameSingle)
+  }
+
+  // Multiplayer
+  function startMultiPlayer() {
+    // gameMode = "multiPlayer"
+
+    const socket = io()
+
+    // Get your player number
+    // Searches for a "player-number" message from the server
+    socket.on("player-number", num => {
+      if (num === -1) {
+        infoDisplay.innerHTML = "Sorry the server is full"
+      }
+      else {
+        playerNumber = parseInt(num)
+        if (playerNumber === 1) currentPlayer = "enemy"    // If second, considered "enemy"
+
+        console.log(playerNumber)
+
+        // Get other player status
+        socket.emit('check-players')
+      }
+    })
+
+
+    // Another player has connected/disconnected
+    socket.on('player-connection', num => {
+      console.log(`Player number ${num} has connected or disconnected`)
+      playerConnectedOrDisconnected(num)
+    })
+
+    // On enemy ready
+    socket.on('enemy-ready', num => {
+      enemyReady = true
+      playerReady(num)
+      if (ready) playGameMulti(socket)
+    })
+
+    // check player status
+    socket.on('check-players', players => {
+      players.forEach((p, i) => {
+        if (p.connected) playerConnectedOrDisconnected(i)
+        if (p.ready) {
+          playerReady(i)
+          if (i !== playerNumber) enemyReady = true
+        }
+      })
+    })
+
+    // On timeout
+    socket.on('timeout', () => {
+      infoDisplay.innerHTML = 'You have reached the 10 minute limit'
+    })
+
+    // ready button click
+    startButton.addEventListener('click', () => {
+      if (allShipsPlaced) playGameMulti(socket)
+      else infoDisplay.innerHTML = "Please place all ships"
+    })
+
+    // Setup event listener for firing
+    computerSquares.forEach(square => {
+      square.addEventListener('click', () => {
+        if (currentPlayer === 'user' && ready && enemyReady) {
+          shotFired = square.dataset.id
+
+          // Turn Player sends a shot to the other player; Server receives the shot and passes it to the other player's client
+          socket.emit('fire', shotFired)
+        }
+      })
+    })
+
+    // On fire Received
+    socket.on('fire', id => {
+      enemyGo(id)
+      const square = userSquares[id]
+      socket.emit('fire-reply', square.classList)
+      playGameMulti(socket)
+    })
+
+    // On fire reply receievd
+    socket.on('fire-reply', classList => {
+      revealSquare(classList)
+      playGameMulti(socket)
+    })
+
+    function playerConnectedOrDisconnected(num) {
+      let player = `.p${parseInt(num) + 1}`
+      document.querySelector(`${player} .connected span`).classList.toggle('green')
+      if (parseInt(num) === playerNumber) document.querySelector(player).style.fontWeight = 'bold'
+    }
+  }
+
+
+  //Create Board
+  function createBoard(grid, squares) {
+    for (let i = 0; i < width * width; i++) {
+      const square = document.createElement('div')
+      square.dataset.id = i
+      grid.appendChild(square)
+      squares.push(square)
+    }
+  }
+  
 
   //Draw the computers ships in random locations
   function generate(ship) {
@@ -297,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else return
 
     displayGrid.removeChild(draggedShip)
-    if(!displayGrid.querySelector('.ship')) allShipsPlaced = true
+    if (!displayGrid.querySelector('.ship')) allShipsPlaced = true
   }
 
   function dragEnd() {
@@ -305,26 +313,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Game Logic for Multi Player
-  function playGameMulti(socket){
-    if(isGameOver) return
-    if(!ready) {
+  function playGameMulti(socket) {
+    if (isGameOver) return
+    if (!ready) {
       socket.emit('player-ready')
       ready = true
       playerReady(playerNumber)
     }
 
-    if(enemyReady) {
-      if (currentPlayer === 'user'){
+    if (enemyReady) {
+      if (currentPlayer === 'user') {
         turnDisplay.innerHTML = "Your Go"
       }
-      if (currentPlayer === 'enemy'){
+      if (currentPlayer === 'enemy') {
         turnDisplay.innerHTML = "Enemy's Go"
       }
     }
   }
 
   function playerReady(num) {
-    let player =  `.p${parseInt(num) + 1}`
+    let player = `.p${parseInt(num) + 1}`
     document.querySelector(`${player} .ready span`).classList.toggle('green')
   }
 
@@ -354,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function revealSquare(classList) {
     const enemySquare = computerGrid.querySelector(`div[data-id='${shotFired}']`)
-    const obj = Object.values(classList) 
+    const obj = Object.values(classList)
     if (!enemySquare.classList.contains('boom') && currentPlayer === 'user' && !isGameOver) {
       if (obj.includes('destroyer')) destroyerCount++
       if (obj.includes('submarine')) submarineCount++
@@ -369,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     checkForWins()
     currentPlayer = 'enemy'
-    if(gameMode === 'singlePlayer') playGameSingle()
+    if (gameMode === 'singlePlayer') playGameSingle()
   }
 
   let cpuDestroyerCount = 0
@@ -396,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function checkForWins() {
     let enemy = 'Computer'
-    if(gameMode === 'multiPlayer') enemy = 'Enemy'
+    if (gameMode === 'multiPlayer') enemy = 'Enemy'
     if (destroyerCount === 2) {
       infoDisplay.innerHTML = `You sunk the ${enemy}'s destroyer`
       destroyerCount = 10
