@@ -4,7 +4,7 @@
   "description": "Multiplayer Battleships",
   "main": "server.js",
   "scripts": {
-    "start": "npm server",
+    "start": "node server",
     "dev": "nodemon server"
   },
   "keywords": [],

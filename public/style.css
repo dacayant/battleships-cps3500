@@ -41,8 +41,9 @@ body {
 }
 
 .btn {
+  font-size: inherit;
   background-color: hsl(30, 100%, 50%);
-  padding: 1rem 5rem;
+  padding: .5rem 1rem;
   outline: none;
   border: none;
   text-decoration: none;
@@ -74,18 +75,104 @@ body {
   grid-template-columns: repeat(10, 4.6vmin);
 }
 
+.grid-computer>.taken {
+  background-color: hsl(200, 100%, 50%) !important;
+  border-radius: 0 !important;
+}
+
 .taken,
 .ship {
+  position: relative;
   background-color: hsl(0, 0%, 80%);
+}
+
+.taken.start.vertical,
+.taken.start.vertical::before {
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
+
+.taken.end.vertical,
+.taken.end.vertical::before {
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+.taken.start.horizontal,
+.taken.start.horizontal::before {
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+
+.taken.end.horizontal,
+.taken.end.horizontal::before {
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+.taken.vertical::before,
+.taken.horizontal::before {
+  content: '';
+  position: absolute;
+  border: .3vmin solid white;
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  right: -1px;
+}
+
+.taken.horizontal::before {
+  animation: ripplesY 2s linear infinite;
+  border-left: none;
+  border-right: none;
+}
+
+.taken.vertical::before {
+  animation: ripplesX 2s linear infinite;
+  border-top: none;
+  border-bottom: none;
+}
+
+@keyframes ripplesX {
+  0% {
+    opacity: 0;
+    transform: scaleX(1)
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleX(1.5)
+  }
+}
+
+@keyframes ripplesY {
+  0% {
+    opacity: 0;
+    transform: scaleY(1)
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleY(1.5)
+  }
 }
 
 .grid-display {
   display: flex;
 }
 
-.ship > div {
+.ship>div {
   width: 4.6vmin !important;
   height: 4.6vmin !important;
+}
+
+.ship {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 1vmin;
+  width: calc(4.6vmin * var(--width, 1));
+  height: calc(4.6vmin * var(--height, 1));
+  border-radius: 2.3vmin;
 }
 
 .battleship-grid div {
@@ -93,97 +180,131 @@ body {
 }
 
 .destroyer-container {
-  width: 80px;
-  height: 40px;
-
-  margin: 10px;
-  display: flex;
+  --width: 2;
 }
 
 .destroyer-container-vertical {
-  width: 40px;
-  height: 80px;
-
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
+  --height: 2;
+  --width: 1;
 }
 
 .submarine-container {
-  width: 120px;
-  height: 40px;
-
-  margin: 10px;
-  display: flex;
+  --width: 3;
 }
 
 .submarine-container-vertical {
-  width: 40px;
-  height: 120px;
-
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
+  --height: 3;
+  --width: 1;
 }
 
 .cruiser-container {
-  width: 120px;
-  height: 40px;
-  margin: 10px;
-  display: flex;
+  --width: 3;
 }
 
 .cruiser-container-vertical {
-  width: 40px;
-  height: 120px;
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
+  --height: 3;
+  --width: 1;
 }
 
 .battleship-container {
-  width: 160px;
-  height: 40px;
-  margin: 10px;
-  display: flex;
+  --width: 4;
 }
 
 .battleship-container-vertical {
-  width: 40px;
-  height: 160px;
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
+  --height: 4;
+  --width: 1;
 }
 
 
 .carrier-container {
-  width: 200px;
-  height: 40px;
-  margin: 10px;
-  display: flex;
+  --width: 5;
 }
 
 .carrier-container-vertical {
-  width: 40px;
-  height: 200px;
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
+  --height: 5;
+  --width: 1;
 }
 
-
-.ship div {
+/* .ship div {
   width: 40px;
   height: 40px;
+} */
+
+.hidden-info {
+  font-size: 1.5rem;
+  align-items: center;
+  flex-direction: column;
 }
 
+.info-text {
+  margin: 1rem;
+}
+
+.miss,
 .boom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boom::after,
+.miss::after {
+  content: '';
+  position: absolute;
+  border-radius: 100%;
+  width: 2vmin;
+  height: 2vmin;
+}
+
+.boom::after {
   background-color: red;
 }
 
-.miss {
-  background-color: black;
+.miss::after {
+  background-color: white;
+}
+
+.miss::before{
+  content: '';
+  position: absolute;
+  animation: hit .7s ease-out forwards;
+  border: .1vmin solid white;
+  border-radius: 100%;
+  width: 2vmin;
+  height: 2vmin;
+}
+
+.boom {
+  content: '';
+  animation: boom .7s ease-out forwards;
+}
+
+.miss::before {
+  border-color: white;
+}
+
+@keyframes hit {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(3.5);
+  }
+
+}
+
+@keyframes boom {
+  0% {
+    background-color: red;
+  }
+
+  100% {
+    background-color: hsla(0, 0%, 80%);
+  }
+
 }
 
 .connected,

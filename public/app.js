@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const rotateButton = document.querySelector('#rotate')
   const turnDisplay = document.querySelector('#whose-go')
   const infoDisplay = document.querySelector('#info')
+  const setUpButtons = document.getElementById('setup-buttons')
+
   // const singlePlayerButton = document.querySelector("#singlePlayerButton")
   // const multiPlayerButton = document.querySelector("#multiPlayerButton")
   const userSquares = []
@@ -69,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   createBoard(userGrid, userSquares)
   createBoard(computerGrid, computerSquares)
 
+  turnDisplay.innerHTML = ""
   // Select Player Mode
   if (gameMode === 'singlePlayer') {
     startSinglePlayer()
@@ -90,7 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
     generate(shipArray[4])
 
     startButton.addEventListener('click', () => {
-      if (allShipsPlaced) playGameSingle()
+      if (allShipsPlaced){
+        setUpButtons.style.display = 'none'
+        infoDisplay.innerHTML = ""
+        playGameSingle()
+      }
       else infoDisplay.innerHTML = "Please place all ships"
     })
   }
@@ -129,7 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('enemy-ready', num => {
       enemyReady = true
       playerReady(num)
-      if (ready) playGameMulti(socket)
+      if (ready){
+        playGameMulti(socket)
+        setUpButtons.style.display = 'none'
+      } 
     })
 
     // check player status
@@ -297,13 +307,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < draggedShipLength; i++) {
-        userSquares[parseInt(this.dataset.id) - selectedShipIndex + i].classList.add('taken', shipClass)
+        let directionClass
+        if (i === 0) directionClass = 'start'
+        if (i === draggedShipLength - 1) directionClass = 'end'
+        userSquares[parseInt(this.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
     } else if (!isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
       for (let i = 0; i < draggedShipLength; i++) {
-        userSquares[parseInt(this.dataset.id) - selectedShipIndex + width * i].classList.add('taken', shipClass)
+        let directionClass
+        if (i === 0) directionClass = 'start'
+        if (i === draggedShipLength - 1) directionClass = 'end'
+        userSquares[parseInt(this.dataset.id) - selectedShipIndex + width * i].classList.add('taken', 'vertical', directionClass, shipClass)
       }
     } else return
 
@@ -350,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }))
     }
     if (currentPlayer === 'enemy') {
-      turnDisplay.innerHTML = 'Enemy\'s Go'
+      turnDisplay.innerHTML = 'Computer\'s Go'
       setTimeout(enemyGo, 1000)
     }
   }
@@ -404,7 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function enemyGo(square) {
     if (gameMode === 'singlePlayer') square = Math.floor(Math.random() * userSquares.length)
     if (!userSquares[square].classList.contains('boom')) {
-      userSquares[square].classList.add('boom')
+      const hit = userSquares[square].classList.contains('taken')
+      userSquares[square].classList.add(hit ? 'boom' : 'miss')
       if (userSquares[square].classList.contains('destroyer')) cpuDestroyerCount++
       if (userSquares[square].classList.contains('submarine')) cpuSubmarineCount++
       if (userSquares[square].classList.contains('cruiser')) cpuCruiserCount++
