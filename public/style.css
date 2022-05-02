@@ -307,19 +307,19 @@ body {
 
 }
 
+.player {
+  margin: 2vmin;
+}
+
 .connected,
 .ready {
   font-weight: normal;
+  opacity: .25;
+  text-decoration: line-through;
 }
 
-.connected span,
-.ready span {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  background: red;
-}
-
-span.green {
-  background: green;
+.connected.active,
+.ready.active {
+  opacity: 1;
+  text-decoration: none;
 }
