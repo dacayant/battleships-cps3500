@@ -137,8 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
       enemyReady = true
       playerReady(num)
       if (ready){
+        infoDisplay.innerHTML = ""
         playGameMulti(socket)
-        setUpButtons.style.display = 'none'
       } 
     })
 
@@ -333,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Game Logic for Multi Player
   function playGameMulti(socket) {
+    setUpButtons.style.display = 'none'
     if (isGameOver) return
     if (!ready) {
       socket.emit('player-ready')

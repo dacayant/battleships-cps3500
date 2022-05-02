@@ -75,7 +75,8 @@ body {
   grid-template-columns: repeat(10, 4.6vmin);
 }
 
-.grid-computer>.taken {
+.grid-computer > .taken,
+.grid-computer > .boom {
   background-color: hsl(200, 100%, 50%) !important;
   border-radius: 0 !important;
 }
